@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 use App\Parsers\ParserFactory;
 
-require_once 'vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
-$parserClassName = 'ParserSantehOrbita';
+$parserClassName = 'ParserSportal';
 
 $parser = ParserFactory::from($parserClassName)->create();
 
 //$parser->clearRelations($parserClassName);
 //$parser->clearProducts($parserClassName);
 
-//$categories = $parser->getCategories();
+$categories = $parser->getCategories();
 //$relations = $parser->getRelations('relations');
-$products = $parser->getProducts();
+//$products = $parser->getProducts();

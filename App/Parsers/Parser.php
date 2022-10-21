@@ -35,6 +35,10 @@ abstract class Parser
 
     abstract public function getImage(Crawler $crawler): string;
 
+    public function getParserClassName() : string {
+        return (new \ReflectionClass(get_called_class()))->getShortName();
+    }
+
     public function formattingRelations($parserClassName)
     {
         // PARSER RELATIONS
