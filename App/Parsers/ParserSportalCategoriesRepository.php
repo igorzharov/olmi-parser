@@ -12,7 +12,7 @@ class ParserSportalCategoriesRepository
     {
         return [
             new Category(
-                title: 'Беговые лыжи',
+                name: 'Беговые лыжи',
                 url: 'https://tdsportal.ru/catalog/lyzhi/',
                 remoteId: 0
             ),

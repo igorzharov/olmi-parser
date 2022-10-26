@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
-use App\Parsers\ParserFactory;
 
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
+// Create a simple "default" Doctrine ORM configuration for Attributes
 $config = ORMSetup::createAttributeMetadataConfiguration(
     paths: array(__DIR__."/Entity"),
     isDevMode: true,
 );
 
+// database configuration parameters
 $conn = array(
     'driver'   => 'pdo_mysql',
     'user'     => 'dbuser',
@@ -21,8 +20,5 @@ $conn = array(
     'dbname'   => 'rent',
 );
 
+// obtaining the entity manager
 $entityManager = EntityManager::create($conn, $config);
-
-$parser = ParserFactory::from('ParserSportal')->create($entityManager);
-
-$categories = $parser->parserStart();

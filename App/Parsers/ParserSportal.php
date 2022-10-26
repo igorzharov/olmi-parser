@@ -15,6 +15,7 @@ use App\Helpers\GetHtmlTrait;
 use App\Helpers\LogTrait;
 use App\Helpers\PriceToNormalTrait;
 use App\Helpers\StringToNormalTrait;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ParserSportal extends ParserAbstract
@@ -27,30 +28,21 @@ class ParserSportal extends ParserAbstract
     use LogTrait;
     use PriceToNormalTrait;
 
-    public function __construct()
+    private string $siteUrl = 'https://tdsportal.ru';
+
+    public function __construct(private readonly EntityManager $entityManager)
     {
         parent::__construct();
     }
 
-    private string $siteUrl = 'https://tdsportal.ru';
-
     private function parserCategories()
     {
-        $categories = (new ParserSportalCategoriesRepository())->getCategories();
+        $category = new Category();
+        $category->setName('Беговые лыжи 1');
+        $category->setUrl('https://tdsportal.ru/catalog/lyzhi/');
+        $category->setRemoteId(0);
 
-        $categoriesContainer = CategoriesContainer::getInstance();
-
-        foreach ($categories as $category) {
-            $category->setParserClassName($this->getParserClassName());
-            $category->setPathHtmlFile(
-                $this->downloadHtml(
-                    url: $category->getUrl(),
-                    foldername: 'Category'
-                )
-            );
-            $category->set();
-            $categoriesContainer->set($category);
-        }
+        $this->entityManager->flush($category);
     }
 
     private function parserGetCategoriesPageLinks()
@@ -149,9 +141,9 @@ class ParserSportal extends ParserAbstract
     public function parserStart()
     {
         $this->parserCategories();
-        $this->parserGetCategoriesPageLinks();
-        $this->parserGetCategoriesProductLinks();
-        $this->parserProducts();
+//        $this->parserGetCategoriesPageLinks();
+//        $this->parserGetCategoriesProductLinks();
+//        $this->parserProducts();
     }
 
     public function getProductTitle(Crawler $crawler): string
