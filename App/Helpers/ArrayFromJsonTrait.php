@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-trait ArrayFromJson
+trait ArrayFromJsonTrait
 {
     private function arrayFromJson(array $array): array
     {

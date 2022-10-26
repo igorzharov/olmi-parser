@@ -6,10 +6,10 @@ namespace App\Parsers;
 
 use App\DB\DBParser;
 use App\Services\LoggerService;
-use App\Helpers\ArrayFromJson;
+use App\Helpers\ArrayFromJsonTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
-abstract class Parser
+abstract class ParserAbstract
 {
     protected DBParser $db;
 
@@ -19,21 +19,15 @@ abstract class Parser
     }
 
     use LoggerService;
-    use ArrayFromJson;
+    use ArrayFromJsonTrait;
 
-    abstract public function getCategories();
+    abstract public function getProductTitle(Crawler $crawler): string;
 
-    abstract public function getRelations(string $fillableTable);
+    abstract public function getProductDescription(Crawler $crawler): string;
 
-    abstract public function getProducts();
+    abstract public function getProductPrice(Crawler $crawler): int;
 
-    abstract public function getTitle(Crawler $crawler): string;
-
-    abstract public function getDescription(Crawler $crawler): string;
-
-    abstract public function getPrice(Crawler $crawler): int;
-
-    abstract public function getImage(Crawler $crawler): string;
+    abstract public function getProductImage(Crawler $crawler): string;
 
     public function getParserClassName() : string {
         return (new \ReflectionClass(get_called_class()))->getShortName();

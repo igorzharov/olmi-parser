@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-trait StringToNormal
+trait StringToNormalTrait
 {
     public function stringToNormal(string $string): string
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-trait ClearCache
+trait ClearCacheTrait
 {
     public function clearCache(string $parserClassName, string $cacheFolder)
     {

@@ -6,297 +6,213 @@ namespace App\Parsers;
 
 use App\Entity\Category;
 
-use App\Helpers\DownloadHtml;
-use App\Helpers\DownloadImage;
-use App\Helpers\StringToNormal;
+use App\Entity\Product;
+use App\EntityContainers\CategoriesContainer;
+use App\EntityContainers\ProductsContainer;
+use App\Helpers\DownloadHtmlTrait;
+use App\Helpers\DownloadImageTrait;
+use App\Helpers\GetHtmlTrait;
+use App\Helpers\LogTrait;
+use App\Helpers\PriceToNormalTrait;
+use App\Helpers\StringToNormalTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ParserSportal extends Parser
+class ParserSportal extends ParserAbstract
 {
 
-    use DownloadHtml;
-    use DownloadImage;
-    use StringToNormal;
-
-//    public ParserSantehOrbitaConfig $config;
+    use DownloadHtmlTrait;
+    use DownloadImageTrait;
+    use GetHtmlTrait;
+    use StringToNormalTrait;
+    use LogTrait;
+    use PriceToNormalTrait;
 
     public function __construct()
     {
         parent::__construct();
-//        $this->config = new ParserSantehOrbitaConfig();
     }
 
-    private string $url = 'https://tdsportal.ru/';
+    private string $siteUrl = 'https://tdsportal.ru';
 
     private function parserCategories()
     {
-        $categories = [
-            new Category(
-                title: 'Беговые лыжи',
-                url: 'https://tdsportal.ru/catalog/lyzhi/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Ботинки лыжные',
-                url: 'https://tdsportal.ru/catalog/botinki_lyzhnye/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Палки лыжные',
-                url: 'https://tdsportal.ru/catalog/palki_lyzhnye/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Крепления лыжные',
-                url: 'https://tdsportal.ru/catalog/lyzhi/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Аксессуары',
-                url: 'https://tdsportal.ru/catalog/aksessuary_3/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Коньки',
-                url: 'https://tdsportal.ru/catalog/konki/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Хоккейное снарежение',
-                url: 'https://tdsportal.ru/catalog/khokkeynoe_snaryazhenie/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Шайбы',
-                url: 'https://tdsportal.ru/catalog/shayby/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Клюшки',
-                url: 'https://tdsportal.ru/catalog/klyushki/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Тюбинги',
-                url: 'https://tdsportal.ru/catalog/tyubingi/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Санки',
-                url: 'https://tdsportal.ru/catalog/sanki/',
-                remoteId: 0
-            ),
-            new Category(
-                title: 'Снегокаты',
-                url: 'https://tdsportal.ru/catalog/snegokaty/',
-                remoteId: 0
-            ),
-        ];
+        $categories = (new ParserSportalCategoriesRepository())->getCategories();
+
+        $categoriesContainer = CategoriesContainer::getInstance();
 
         foreach ($categories as $category) {
             $category->setParserClassName($this->getParserClassName());
-            $this->downloadHtml($category);
+            $category->setPathHtmlFile(
+                $this->downloadHtml(
+                    url: $category->getUrl(),
+                    foldername: 'Category'
+                )
+            );
             $category->set();
+            $categoriesContainer->set($category);
         }
     }
 
-    private function parserRelations(string $fillableTable)
+    private function parserGetCategoriesPageLinks()
     {
-        $selectColumns = ['category_id', 'parent_id', 'title', 'description', 'url', 'image', 'parser_class', 'status'];
-
-        $categories = $this->db->select('categories', $selectColumns, ['parser_class' => $this->parserClassName]);
+        $categories = CategoriesContainer::getInstance()->get();
 
         foreach ($categories as $category) {
-            $url = $category['url'] . '?PAGEN_1=';
-
-            $counter = 1;
-
-            $html = $this->downloadHtml($url . $counter, $this->parserClassName . '/relations');
+            $html = $this->getHtml($category->getPathHtmlFile());
 
             $crawler = new Crawler($html);
 
-            if ($crawler->filter('.intec-sections-tile.row')->count() > 0) {
-                continue;
-            }
+            $paginationElement = $crawler->filter('.module-pagination');
 
-            $this->relationCrawler($fillableTable, $crawler, $counter, $category);
+            $paginationElementMax = $crawler->filter('.module-pagination .nums > a:last-child');
 
-            $pagination = $crawler->filter('.bx-pagination-container')->count();
+            $category->addPageLink($category->getUrl());
 
-            if ($pagination) {
-                start:
+            if ($paginationElement->count()) {
+                $numberOfPages = $paginationElementMax->text();
 
-                $next = $crawler->filter('.bx-pag-next a')->count();
+                for ($i = 2; $i <= $numberOfPages; $i++) {
+                    $url = $category->getUrl() . '?PAGEN_1=' . $i;
 
-                if ($next) {
-                    $counter++;
-
-                    $html = $this->downloadHtml($url . $counter, $this->parserClassName . '/relations');
-
-                    $crawler = new Crawler($html);
-
-                    $this->relationCrawler($fillableTable, $crawler, $counter, $category);
-
-                    goto start;
+                    $category->addPageLink($url);
                 }
             }
         }
     }
 
-    private function relationCrawler($fillableTable, $crawler, $counter, $category)
+    private function parserGetCategoriesProductLinks()
     {
-        $crawler->filter('.intec-catalog-section .catalog-section-element')->each(
-            function (Crawler $node) use ($fillableTable, $counter, $category) {
-                $url = $category['url'] . '?PAGEN_1=';
+        $categories = CategoriesContainer::getInstance()->get();
 
-                $productUrl = $this->url . $node->filter('.element-name a')->attr('href');
+        foreach ($categories as $category) {
+            $pageLinks = $category->getPageLinks();
 
-                $this->db->insert(
-                    $fillableTable,
-                    [
-                        'category_id'  => $category['category_id'],
-                        'category_url' => $url . $counter,
-                        'product_url'  => $productUrl,
-                        'parser_class' => $this->parserClassName
-                    ]
-                );
+            foreach ($pageLinks as $pageLink) {
+                $html = $this->getHtml($this->downloadHtml($pageLink, 'CategoriesPages'));
 
-                $this->getLogRelation($productUrl);
+                $crawler = new Crawler($html);
+
+                $crawler->filter('.catalog_block .item_block')->each(function (Crawler $node) use ($category) {
+                    $link = $this->siteUrl . $node->filter('.catalog_item_wrapp .catalog_item div .item-title a')->attr(
+                            'href'
+                        );
+
+                    $category->addProductUrl($link);
+                });
             }
-        );
+        }
+
+        $this->writeLog($categories, '$categories');
     }
 
     private function parserProducts()
     {
-        $selectColumns = [
-            'product_id',
-            'category_id',
-            'category_url',
-            'product_url',
-            'parser_class',
-            'is_parsed',
-            'status'
-        ];
+        $categories = CategoriesContainer::getInstance()->get();
 
-        $where = ['is_parsed[=]' => 0, 'status' => 1];
+        foreach ($categories as $category) {
+            $productUrls = $category->getProductUrls();
 
-        $relations = $this->db->select('relations', $selectColumns, $where);
+            foreach ($productUrls as $productUrl) {
+                $html = $this->getHtml(
+                    $this->downloadHtml(
+                        url: $productUrl,
+                        foldername: 'Products'
+                    )
+                );
 
-        foreach ($relations as $relation) {
-            $html = $this->downloadHtml($relation['product_url'], $this->parserClassName . '/products');
+                $crawler = new Crawler($html);
 
-            $crawler = new Crawler($html);
+                $title = $this->getProductTitle($crawler);
+                $description = $this->getProductDescription($crawler);
+                $price = $this->getProductPrice($crawler);
+                $image = $this->getProductImage($crawler);
 
-            $title = $this->getTitle($crawler);
-            $description = $this->getDescription($crawler);
-            $price = $this->getPrice($crawler);
-            $image = $this->getImage($crawler);
-            $status = 1;
+//                $options = $this->getProductOptions();
 
-            if ($price == 0 || $title == '') {
-                $status = 0;
+                $product = new Product(
+                    title: $title,
+                    description: $description,
+                    price: $price,
+                    image: $image,
+                    url: $productUrl
+                );
+
+                $product->setParserClassName($this->getParserClassName());
+
+                $product->set();
+
+                ProductsContainer::getInstance()->set($product);
             }
-
-            $dateNow = date('Y-m-d H:i:s');
-
-            $insertColumns = [
-                'product_id'   => $relation['product_id'],
-                'title'        => $title,
-                'description'  => $description,
-                'price'        => $price,
-                'image'        => $image,
-                'product_url'  => $relation['product_url'],
-                'date_added'   => $dateNow,
-                'date_modify'  => $dateNow,
-                'parser_class' => $this->parserClassName,
-                'is_parsed'    => 0,
-                'is_update'    => 0,
-                'status'       => $status
-            ];
-
-            // SQL
-            $this->db->insert('products', $insertColumns);
-
-            // SQL
-            $this->db->update('relations', ['is_parsed' => 1], ['product_id[=]' => $relation['product_id']]);
-
-            // LOG
-            $this->getLogProduct($title);
         }
     }
 
-    public function getCategories()
+    public function parserStart()
     {
         $this->parserCategories();
-//        $this->parserChildCategories();
-    }
-
-    public function getRelations(string $fillableTable)
-    {
-        $this->parserRelations($fillableTable);
-    }
-
-    public function getProducts()
-    {
+        $this->parserGetCategoriesPageLinks();
+        $this->parserGetCategoriesProductLinks();
         $this->parserProducts();
     }
 
-    public function getTitle(Crawler $crawler): string
+    public function getProductTitle(Crawler $crawler): string
+    {
+        return $this->stringToNormal($crawler->filter('#pagetitle')->text());
+    }
+
+    public function getProductDescription(Crawler $crawler): string
     {
         try {
-            $errorText = $crawler->filter('.intec-content-wrapper .col-xs-12 p .errortext');
+            $description = '';
 
-            if ($errorText->count() && $errorText->text() == 'Элемент не найден') {
-                return '';
+            $descriptionText = $crawler->filter('.tab-content .detail_text');
+
+            $characteristics = $crawler->filter('.tab-content table.props_list');
+
+            if ($descriptionText->count()) {
+                $description .= trim($descriptionText->html());
+                $description .= '<br>';
+                $description .= '<br>';
             }
 
-            $title = $crawler->filter('.intec-content-wrapper h1')->text();
+            if ($characteristics->count()) {
+                $description .= trim($characteristics->html());
+            }
 
-            return $this->stringToNormal($title);
-        } catch (\Exception $exception) {
-            var_dump($exception->getMessage());
-            return '';
-        }
-    }
-
-    public function getDescription(Crawler $crawler): string
-    {
-        try {
-            return $crawler->filter('#tab-description')->html();
+            return $description;
         } catch (\Exception $exception) {
             return '';
         }
     }
 
-    public function getPrice(Crawler $crawler): int
+    public function getProductPrice(Crawler $crawler): int
     {
-        try {
-            $price = $crawler->filter('.item-additional-price .price-СайтРозничные')->text();
+        $price = 0;
 
-            $price = str_replace(' ', '', $price);
+        $price_selector = $crawler->filter('.item_main_info .info_item .middle_info .prices_block .cost > .price .values_wrapper');
 
-            $price = $this->stringToNormal($price);
-
-            $price = mb_substr($price, 0, strlen($price) - 4);
-
-            return (int)$price;
-        } catch (\Exception $exception) {
-            return 0;
+        if ($price_selector->count()) {
+            $price = $price_selector->text();
         }
+
+        $price_selector = $crawler->filter('.item_main_info .price_value');
+
+        if ($price_selector->count()) {
+            $price = $price_selector->text();
+        }
+
+        return $this->priceToNormalTrait($price);
     }
 
-    public function getImage(Crawler $crawler): string
+    public function getProductImage(Crawler $crawler): string
     {
         try {
-            $url = $crawler->filter('.item-bigimage-container .item-bigimage-wrap .item-bigimage')->attr('src');
+            $url = $this->siteUrl . $crawler->filter('.item_main_info .slides a')->attr('href');
 
             if ($url == '') {
                 return '';
             }
 
-            $url = $this->url . $url;
-
-            return $this->downloadImage($url, $this->parserClassName);
+            return $this->downloadImage($url, $this->getParserClassName());
         } catch (\Exception $exception) {
             return '';
         }

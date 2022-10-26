@@ -7,8 +7,8 @@ namespace App\Handlers;
 use App\DB\DBParser;
 use App\Services\Helper;
 use App\Services\LoggerService;
-use App\Helpers\ArrayFromJson;
-use App\Helpers\ClearCache;
+use App\Helpers\ArrayFromJsonTrait;
+use App\Helpers\ClearCacheTrait;
 use App\Parsers\ParserFactory;
 
 use Rogervila\ArrayDiffMultidimensional;
@@ -22,7 +22,7 @@ class Adder
         $this->db = new DBParser();
     }
 
-    use ClearCache;
+    use ClearCacheTrait;
     use LoggerService;
 
     public function adder()

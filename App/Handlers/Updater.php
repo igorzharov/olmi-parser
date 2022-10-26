@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Handlers;
 
 use App\DB\DBParser;
-use App\Helpers\GetHtml;
+use App\Helpers\GetHtmlTrait;
 use App\Services\LoggerService;
 use App\Parsers\ParserFactory;
 use Symfony\Component\DomCrawler\Crawler;
@@ -20,7 +20,7 @@ class Updater
     }
 
     use LoggerService;
-    use GetHtml;
+    use GetHtmlTrait;
 
     public function updater()
     {

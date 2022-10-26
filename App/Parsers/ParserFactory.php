@@ -9,7 +9,7 @@ enum ParserFactory: string
     case SANTEHORBITA = 'ParserSantehOrbita';
     case SPORTAL = 'ParserSportal';
 
-    public function create(): Parser
+    public function create(): ParserAbstract
     {
         return match ($this) {
             self::SANTEHORBITA => new ParserSantehOrbita(),

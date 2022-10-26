@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-trait DownloadImage
+trait DownloadImageTrait
 {
     public function downloadImage(string $url, string $parserName): string
     {

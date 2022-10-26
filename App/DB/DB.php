@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace App\DB;
 
-use App\Entity\AEntity;
-use App\Entity\Category;
 use Medoo\Medoo;
 
 class DB
 {
     public Medoo $db;
-
-    public function insertEntity(AEntity $entity)
-    {
-        $this->db->insert($entity->getType(), ['parent_id' => 0, 'title' => $entity->getTitle(), 'description' => $entity->getDescription(), 'url' => $entity->getUrl(), 'parser_class' => $entity->getParserClassName()]);
-    }
 
     public function insert(string $table, array $data)
     {

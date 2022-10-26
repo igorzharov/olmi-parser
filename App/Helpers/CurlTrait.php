@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-trait Curl
+trait CurlTrait
 {
     public function curl(string $url, $referer = 'http://www.google.com'): string
     {

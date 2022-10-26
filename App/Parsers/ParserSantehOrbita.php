@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Parsers;
 
 use App\Config\ParserSantehOrbitaConfig;
-use App\Helpers\DownloadHtml;
-use App\Helpers\DownloadImage;
-use App\Helpers\StringToNormal;
+use App\Helpers\DownloadHtmlTrait;
+use App\Helpers\DownloadImageTrait;
+use App\Helpers\StringToNormalTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ParserSantehOrbita extends Parser
+class ParserSantehOrbita extends ParserAbstract
 {
 
-    use DownloadHtml;
-    use DownloadImage;
-    use StringToNormal;
+    use DownloadHtmlTrait;
+    use DownloadImageTrait;
+    use StringToNormalTrait;
 
     public ParserSantehOrbitaConfig $config;
 

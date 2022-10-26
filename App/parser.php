@@ -13,6 +13,6 @@ $parser = ParserFactory::from($parserClassName)->create();
 //$parser->clearRelations($parserClassName);
 //$parser->clearProducts($parserClassName);
 
-$categories = $parser->getCategories();
+$categories = $parser->parserStart();
 //$relations = $parser->getRelations('relations');
 //$products = $parser->getProducts();

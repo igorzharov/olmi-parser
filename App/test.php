@@ -4,7 +4,7 @@ namespace App;
 
 use App\DB\DBParser;
 use App\DB\DBRemote;
-use App\Helpers\DownloadHtml;
+use App\Helpers\DownloadHtmlTrait;
 
 require_once 'vendor/autoload.php';
 
@@ -16,7 +16,7 @@ class test
         $this->db = new DBParser();
     }
 
-    use DownloadHtml;
+    use DownloadHtmlTrait;
 
     public function test()
     {
