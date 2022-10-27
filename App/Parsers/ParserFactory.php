@@ -11,11 +11,11 @@ enum ParserFactory: string
     case SANTEHORBITA = 'ParserSantehOrbita';
     case SPORTAL = 'ParserSportal';
 
-    public function create(EntityManager $entityManager): ParserAbstract
+    public function create(): ParserAbstract
     {
         return match ($this) {
             self::SANTEHORBITA => new ParserSantehOrbita(),
-            self::SPORTAL => new ParserSportal($entityManager),
+            self::SPORTAL => new ParserSportal(),
         };
     }
 }

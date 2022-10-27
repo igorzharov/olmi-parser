@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Parsers\ParserFactory;
-use App\Repository\CategoryRemoteRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ProductSenderRepository;
+use Doctrine\ORM\EntityManager;
 
 class ProductService
 {
@@ -18,15 +17,11 @@ class ProductService
     private CategoryRepository       $categoryRepository;
     private CategoryRemoteRepository $categoryRemoteRepository;
 
+    private readonly EntityManager $entityManager;
+
     public function __construct()
     {
-        $this->productRepository = new ProductRepository();
-
-        $this->categoryRepository = new CategoryRepository();
-
-        $this->categoryRemoteRepository = new CategoryRemoteRepository();
-
-        $this->sender = new ProductSenderRepository();
+        $this->entityManager = EntityManager::create();
     }
 
     public function send($parserClassName)

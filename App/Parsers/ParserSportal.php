@@ -30,27 +30,48 @@ class ParserSportal extends ParserAbstract
 
     private string $siteUrl = 'https://tdsportal.ru';
 
-    public function __construct(private readonly EntityManager $entityManager)
+    public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     private function parserCategories()
     {
-        $category = new Category();
-        $category->setName('Беговые лыжи 1');
-        $category->setUrl('https://tdsportal.ru/catalog/lyzhi/');
-        $category->setRemoteId(0);
+        $categories = ParserSportalCategoriesRepository::getCategories();
 
-        $this->entityManager->flush($category);
-    }
-
-    private function parserGetCategoriesPageLinks()
-    {
-        $categories = CategoriesContainer::getInstance()->get();
+        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
 
         foreach ($categories as $category) {
-            $html = $this->getHtml($category->getPathHtmlFile());
+
+            $hasCategory = $categoryRepository->findOneBy(['name' => $category->getName()]);
+
+            if ($hasCategory) {
+                continue;
+            }
+
+            $this->entityManager->persist($category);
+            $this->entityManager->flush($category);
+        }
+    }
+
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    private function parserGetCategoriesPagesUrls()
+    {
+        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+
+        /** @var $categories Category[] */
+        $categories = $categoryRepository->findAll();
+
+        foreach ($categories as $category) {
+
+            $html = $this->getHtml($this->downloadHtml($category->getUrl(), 'Category'));
 
             $crawler = new Crawler($html);
 
@@ -58,7 +79,7 @@ class ParserSportal extends ParserAbstract
 
             $paginationElementMax = $crawler->filter('.module-pagination .nums > a:last-child');
 
-            $category->addPageLink($category->getUrl());
+            $category->addPageUrl($category->getUrl());
 
             if ($paginationElement->count()) {
                 $numberOfPages = $paginationElementMax->text();
@@ -66,42 +87,60 @@ class ParserSportal extends ParserAbstract
                 for ($i = 2; $i <= $numberOfPages; $i++) {
                     $url = $category->getUrl() . '?PAGEN_1=' . $i;
 
-                    $category->addPageLink($url);
+                    $category->addPageUrl($url);
                 }
             }
+
+            $this->entityManager->flush($category);
         }
     }
 
-    private function parserGetCategoriesProductLinks()
+    private function parserGetCategoriesProductsUrls()
     {
-        $categories = CategoriesContainer::getInstance()->get();
+        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+
+        /** @var $categories Category[] */
+        $categories = $categoryRepository->findAll();
 
         foreach ($categories as $category) {
-            $pageLinks = $category->getPageLinks();
 
-            foreach ($pageLinks as $pageLink) {
-                $html = $this->getHtml($this->downloadHtml($pageLink, 'CategoriesPages'));
+            $pagesUrls = $category->getPagesUrls();
+
+            foreach ($pagesUrls as $pageUrl) {
+                $html = $this->getHtml($this->downloadHtml($pageUrl, 'CategoriesPages'));
 
                 $crawler = new Crawler($html);
 
                 $crawler->filter('.catalog_block .item_block')->each(function (Crawler $node) use ($category) {
-                    $link = $this->siteUrl . $node->filter('.catalog_item_wrapp .catalog_item div .item-title a')->attr(
+                    $url = $this->siteUrl . $node->filter('.catalog_item_wrapp .catalog_item div .item-title a')->attr(
                             'href'
                         );
 
-                    $category->addProductUrl($link);
+                    $category->addProductUrl($url);
                 });
             }
+
+            $this->entityManager->flush($category);
         }
 
         $this->writeLog($categories, '$categories');
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     private function parserProducts()
     {
-        $categories = CategoriesContainer::getInstance()->get();
+        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+
+        /** @var $categories Category[] */
+        $categories = $categoryRepository->findAll();
+
+        $productRepository = $this->entityManager->getRepository('App\Entity\Category');
 
         foreach ($categories as $category) {
+
             $productUrls = $category->getProductUrls();
 
             foreach ($productUrls as $productUrl) {
@@ -114,26 +153,28 @@ class ParserSportal extends ParserAbstract
 
                 $crawler = new Crawler($html);
 
-                $title = $this->getProductTitle($crawler);
-                $description = $this->getProductDescription($crawler);
-                $price = $this->getProductPrice($crawler);
-                $image = $this->getProductImage($crawler);
+                $product = new Product();
 
-//                $options = $this->getProductOptions();
+                $hasProduct = $productRepository->findOneBy(['name' => $this->getProductTitle($crawler)]);
 
-                $product = new Product(
-                    title: $title,
-                    description: $description,
-                    price: $price,
-                    image: $image,
-                    url: $productUrl
-                );
+                if ($hasProduct) {
+                    continue;
+                }
+
+                $product->setName($this->getProductTitle($crawler));
+
+                $product->setDescription($this->getProductDescription($crawler));
+
+                $product->setPrice($this->getProductPrice($crawler));
+
+                $product->setImage($this->getProductImage($crawler));
+
+                $product->setUrl($productUrl);
 
                 $product->setParserClassName($this->getParserClassName());
 
-                $product->set();
-
-                ProductsContainer::getInstance()->set($product);
+                $this->entityManager->persist($product);
+                $this->entityManager->flush($product);
             }
         }
     }
@@ -141,9 +182,9 @@ class ParserSportal extends ParserAbstract
     public function parserStart()
     {
         $this->parserCategories();
-//        $this->parserGetCategoriesPageLinks();
-//        $this->parserGetCategoriesProductLinks();
-//        $this->parserProducts();
+        $this->parserGetCategoriesPagesUrls();
+        $this->parserGetCategoriesProductsUrls();
+        $this->parserProducts();
     }
 
     public function getProductTitle(Crawler $crawler): string
@@ -180,7 +221,9 @@ class ParserSportal extends ParserAbstract
     {
         $price = 0;
 
-        $price_selector = $crawler->filter('.item_main_info .info_item .middle_info .prices_block .cost > .price .values_wrapper');
+        $price_selector = $crawler->filter(
+            '.item_main_info .info_item .middle_info .prices_block .cost > .price .values_wrapper'
+        );
 
         if ($price_selector->count()) {
             $price = $price_selector->text();

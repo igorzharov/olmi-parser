@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-namespace App\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -30,10 +30,19 @@ class Category
     private int $remoteId = 0;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $pages;
+    private ?array $pagesUrls;
 
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $productUrls;
+
+    public function __construct(string $name, string $url, int $remoteId)
+    {
+        $this->name = $name;
+        $this->url = $url;
+        $this->remoteId = $remoteId;
+
+        $this->relations = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -80,23 +89,33 @@ class Category
         $this->remoteId = $remoteId;
     }
 
-    public function getPages(): array
+    public function getPagesUrls(): array
     {
-        return $this->pages;
+        return $this->pagesUrls;
     }
 
-    public function setPages(array $pages) : void
+    public function addPageUrl(string $pageUrl) : void
     {
-        $this->pages = $pages;
+        $this->pagesUrls[] = $pageUrl;
+    }
+
+    public function clearPagesUrls()
+    {
+        $this->pagesUrls = [];
     }
 
     public function getProductUrls(): array
     {
-        return $this->pages;
+        return $this->productUrls;
     }
 
-    public function setProductUrls(array $productUrls) : void
+    public function addProductUrl(string $productUrl) : void
     {
-        $this->pages = $productUrls;
+        $this->productUrls[] = $productUrl;
+    }
+
+    public function clearProductUrls()
+    {
+        $this->productUrls = [];
     }
 }

@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace App\Parsers;
 
-use App\DB\DBParser;
+use App\bin\EntityManagerFactory;
 use App\Services\LoggerService;
 use App\Helpers\ArrayFromJsonTrait;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMSetup;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class ParserAbstract
 {
-    protected DBParser $db;
+    protected readonly EntityManager $entityManager;
 
     public function __construct()
     {
-        $this->db = new DBParser();
+        $this->entityManager = EntityManagerFactory::create();
     }
 
     use LoggerService;

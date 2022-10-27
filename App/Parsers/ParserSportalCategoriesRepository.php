@@ -8,7 +8,7 @@ use App\Entity\Category;
 
 class ParserSportalCategoriesRepository
 {
-    public function getCategories() : array
+    public static function getCategories() : array
     {
         return [
             new Category(
@@ -17,222 +17,222 @@ class ParserSportalCategoriesRepository
                 remoteId: 0
             ),
             new Category(
-                title: 'Ботинки лыжные',
+                name: 'Ботинки лыжные',
                 url: 'https://tdsportal.ru/catalog/botinki_lyzhnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Палки лыжные',
+                name: 'Палки лыжные',
                 url: 'https://tdsportal.ru/catalog/palki_lyzhnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Крепления лыжные',
+                name: 'Крепления лыжные',
                 url: 'https://tdsportal.ru/catalog/krepleniya_lyzhnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Аксессуары',
+                name: 'Аксессуары',
                 url: 'https://tdsportal.ru/catalog/aksessuary_3/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Коньки',
+                name: 'Коньки',
                 url: 'https://tdsportal.ru/catalog/konki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Хоккейное снарежение',
+                name: 'Хоккейное снарежение',
                 url: 'https://tdsportal.ru/catalog/khokkeynoe_snaryazhenie/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Шайбы',
+                name: 'Шайбы',
                 url: 'https://tdsportal.ru/catalog/shayby/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Клюшки',
+                name: 'Клюшки',
                 url: 'https://tdsportal.ru/catalog/klyushki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Тюбинги',
+                name: 'Тюбинги',
                 url: 'https://tdsportal.ru/catalog/tyubingi/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Санки',
+                name: 'Санки',
                 url: 'https://tdsportal.ru/catalog/sanki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Снегокаты',
+                name: 'Снегокаты',
                 url: 'https://tdsportal.ru/catalog/snegokaty/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Купальники, лосины, шорты',
+                name: 'Купальники, лосины, шорты',
                 url: 'https://tdsportal.ru/catalog/kupalniki_losiny_shorty/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Кимоно',
+                name: 'Кимоно',
                 url: 'https://tdsportal.ru/catalog/kimono/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Чешки',
+                name: 'Чешки',
                 url: 'https://tdsportal.ru/catalog/cheshki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Балетки',
+                name: 'Балетки',
                 url: 'https://tdsportal.ru/catalog/baletki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Гимнастическая обувь',
+                name: 'Гимнастическая обувь',
                 url: 'https://tdsportal.ru/catalog/polutapochki_dlya_khudozhestvennoy_gimnastiki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Кросовки',
+                name: 'Кросовки',
                 url: 'https://tdsportal.ru/catalog/krossovki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Бутсы',
+                name: 'Бутсы',
                 url: 'https://tdsportal.ru/catalog/butsy/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Бокс, единобрства',
+                name: 'Бокс, единобрства',
                 url: 'https://tdsportal.ru/catalog/boks_edinoborstva/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Тенис, бадментон',
+                name: 'Тенис, бадментон',
                 url: 'https://tdsportal.ru/catalog/tennis_badminton/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Плавание',
+                name: 'Плавание',
                 url: 'https://tdsportal.ru/catalog/plavanie/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Мячи баскетбольные',
+                name: 'Мячи баскетбольные',
                 url: 'https://tdsportal.ru/catalog/myachi_basketbolnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Мячи волейбольные',
+                name: 'Мячи волейбольные',
                 url: 'https://tdsportal.ru/catalog/myachi_voleybolnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Мячи футбольные',
+                name: 'Мячи футбольные',
                 url: 'https://tdsportal.ru/catalog/myachi_futbolnye/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Мячи гимнастические',
+                name: 'Мячи гимнастические',
                 url: 'https://tdsportal.ru/catalog/myachi_gimnasticheskie/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Обручи',
+                name: 'Обручи',
                 url: 'https://tdsportal.ru/catalog/obruchi_i_aksessuary/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Скакалки',
+                name: 'Скакалки',
                 url: 'https://tdsportal.ru/catalog/skakalki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Степ-платформы',
+                name: 'Степ-платформы',
                 url: 'https://tdsportal.ru/catalog/step_platformy/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Гантели',
+                name: 'Гантели',
                 url: 'https://tdsportal.ru/catalog/ganteli/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Грифы',
+                name: 'Грифы',
                 url: 'https://tdsportal.ru/catalog/grify/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Утяжелители',
+                name: 'Утяжелители',
                 url: 'https://tdsportal.ru/catalog/utyazheliteli/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Защита, суппорты',
+                name: 'Защита, суппорты',
                 url: 'https://tdsportal.ru/catalog/supporty_zashchita/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Коврики',
+                name: 'Коврики',
                 url: 'https://tdsportal.ru/catalog/kovriki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Спальный мешок',
+                name: 'Спальный мешок',
                 url: 'https://tdsportal.ru/catalog/spalnye_meshki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Скандинавская ходьба',
+                name: 'Скандинавская ходьба',
                 url: 'https://tdsportal.ru/catalog/palki_dlya_skandinavskoy_khodby/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Беговые дорожи',
+                name: 'Беговые дорожи',
                 url: 'https://tdsportal.ru/catalog/begovye_dorozhki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Велотренажеры',
+                name: 'Велотренажеры',
                 url: 'https://tdsportal.ru/catalog/velotrenazhery/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Эллиптические тренажеры',
+                name: 'Эллиптические тренажеры',
                 url: 'https://tdsportal.ru/catalog/ellipticheskie_trenazhery/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Силовые тренажеры',
+                name: 'Силовые тренажеры',
                 url: 'https://tdsportal.ru/catalog/silovye_trenazhery/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Гребля',
+                name: 'Гребля',
                 url: 'https://tdsportal.ru/catalog/greblya/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Скамьи',
+                name: 'Скамьи',
                 url: 'https://tdsportal.ru/catalog/skami/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Шведская стенка',
+                name: 'Шведская стенка',
                 url: 'https://tdsportal.ru/catalog/shvedskie_stenki_i_dsk/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Турники',
+                name: 'Турники',
                 url: 'https://tdsportal.ru/catalog/turniki/',
                 remoteId: 0
             ),
             new Category(
-                title: 'Степперы',
+                name: 'Степперы',
                 url: 'https://tdsportal.ru/catalog/steppery/',
                 remoteId: 0
             ),
