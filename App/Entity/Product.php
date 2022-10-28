@@ -50,6 +50,9 @@ class Product
     private bool $is_update;
 
     #[ORM\Column(type: 'boolean')]
+    private bool $is_sent;
+
+    #[ORM\Column(type: 'boolean')]
     private bool $status;
 
     public function __construct()
@@ -57,9 +60,8 @@ class Product
         $this->date_create = new DateTime();
         $this->date_modify = new DateTime();
         $this->is_update = true;
+        $this->is_sent = false;
         $this->status = true;
-
-        $this->relations = new ArrayCollection();
     }
 
     public function getId(): int
@@ -145,6 +147,11 @@ class Product
     public function setIsUpdate(bool $isUpdate)
     {
         $this->is_update = $isUpdate;
+    }
+
+    public function setIsSent(bool $isSent)
+    {
+        $this->is_sent = $isSent;
     }
 
 }

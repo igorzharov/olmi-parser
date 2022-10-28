@@ -7,15 +7,12 @@ namespace App\Parsers;
 use App\Entity\Category;
 
 use App\Entity\Product;
-use App\EntityContainers\CategoriesContainer;
-use App\EntityContainers\ProductsContainer;
 use App\Helpers\DownloadHtmlTrait;
 use App\Helpers\DownloadImageTrait;
 use App\Helpers\GetHtmlTrait;
 use App\Helpers\LogTrait;
 use App\Helpers\PriceToNormalTrait;
 use App\Helpers\StringToNormalTrait;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ParserSportal extends ParserAbstract
@@ -43,7 +40,7 @@ class ParserSportal extends ParserAbstract
     {
         $categories = ParserSportalCategoriesRepository::getCategories();
 
-        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         foreach ($categories as $category) {
 
@@ -52,6 +49,8 @@ class ParserSportal extends ParserAbstract
             if ($hasCategory) {
                 continue;
             }
+
+            $category->setParserClassName($this->getParserClassName());
 
             $this->entityManager->persist($category);
             $this->entityManager->flush($category);
@@ -64,7 +63,7 @@ class ParserSportal extends ParserAbstract
      */
     private function parserGetCategoriesPagesUrls()
     {
-        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         /** @var $categories Category[] */
         $categories = $categoryRepository->findAll();
@@ -95,9 +94,13 @@ class ParserSportal extends ParserAbstract
         }
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     private function parserGetCategoriesProductsUrls()
     {
-        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         /** @var $categories Category[] */
         $categories = $categoryRepository->findAll();
@@ -122,8 +125,6 @@ class ParserSportal extends ParserAbstract
 
             $this->entityManager->flush($category);
         }
-
-        $this->writeLog($categories, '$categories');
     }
 
     /**
@@ -132,12 +133,12 @@ class ParserSportal extends ParserAbstract
      */
     private function parserProducts()
     {
-        $categoryRepository = $this->entityManager->getRepository('App\Entity\Category');
+        $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         /** @var $categories Category[] */
         $categories = $categoryRepository->findAll();
 
-        $productRepository = $this->entityManager->getRepository('App\Entity\Category');
+        $productRepository = $this->entityManager->getRepository(Product::class);
 
         foreach ($categories as $category) {
 
@@ -175,10 +176,17 @@ class ParserSportal extends ParserAbstract
 
                 $this->entityManager->persist($product);
                 $this->entityManager->flush($product);
+
+                $category->addProduct($product);
+                $this->entityManager->flush($category);
             }
         }
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
     public function parserStart()
     {
         $this->parserCategories();

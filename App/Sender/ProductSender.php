@@ -1,21 +1,28 @@
 <?php
 
-declare(strict_types=1);
-
-namespace App\Repository;
+namespace App\Sender;
 
 use App\DB\DBRemote;
+use App\Services\ProductDataFactoryService;
 
-class ProductSenderRepository
+class ProductSender
 {
-    private DBRemote $db;
+    private readonly DBRemote $db;
 
     public function __construct()
     {
         $this->db = new DBRemote();
     }
 
-    public function addProducts(array $data)
+    public function send(string $parserName) {
+
+        $data = (new ProductDataFactoryService())->getGeneratedData($parserName);
+
+        $this->sendProducts($data);
+
+    }
+
+    public function sendProducts(array $data)
     {
         $packageData = [];
 
@@ -29,9 +36,9 @@ class ProductSenderRepository
         {
             $start = microtime(true);
 
-            $product_id = $this->addProduct($key);
+            $product_id = $this->sendProduct($key);
 
-            echo 'Отправил Товар ' . $key['id'] . ' - ' . round(microtime(true) - $start, 3) . ' сек.' . PHP_EOL;
+            echo 'Отправил Товар ' . $key['name'] . ' - ' . round(microtime(true) - $start, 3) . ' сек.' . PHP_EOL;
 
             $key['product_id'] = $product_id;
 
@@ -39,7 +46,7 @@ class ProductSenderRepository
 
             if ($count_packages == $countAddPackages)
             {
-                $this->addPackage($packageData);
+                $this->sendPackage($packageData);
                 echo '!!! Отправил Пакет - ' . round(microtime(true) - $start, 3) . ' сек.' . PHP_EOL;
                 $packageData = [];
             }
@@ -47,7 +54,7 @@ class ProductSenderRepository
             if (count($packageData) == $packageSize)
             {
                 $start = microtime(true);
-                $this->addPackage($packageData);
+                $this->sendPackage($packageData);
                 echo '!!! Отправил Пакет - ' . round(microtime(true) - $start, 3) . ' сек.' . PHP_EOL;
                 $packageData = [];
                 $countAddPackages++;
@@ -55,7 +62,7 @@ class ProductSenderRepository
         }
     }
 
-    private function addProduct($data): int
+    private function sendProduct($data): int
     {
         unset($data['id'], $data['name'], $data['description'], $data['meta_title'], $data['meta_description'], $data['renter_id'], $data['category_id'], $data['store_id'], $data['layout_id'], $data['language_id']);
 
@@ -64,16 +71,16 @@ class ProductSenderRepository
         return $this->db->id();
     }
 
-    private function addPackage($packageData)
+    private function sendPackage($packageData)
     {
-        $this->addDescriptionPackage($packageData);
-        $this->addImagePackage($packageData);
-        $this->addCategoryPackage($packageData);
-        $this->addStorePackage($packageData);
-        $this->addRenterPackage($packageData);
+        $this->sendDescriptionPackage($packageData);
+        $this->sendImagePackage($packageData);
+        $this->sendCategoryPackage($packageData);
+        $this->sendStorePackage($packageData);
+        $this->sendRenterPackage($packageData);
     }
 
-    private function addDescriptionPackage($packageData)
+    private function sendDescriptionPackage($packageData)
     {
         $data = [];
 
@@ -85,7 +92,7 @@ class ProductSenderRepository
         $this->db->insert('oc_product_description', $data);
     }
 
-    private function addImagePackage($packageData)
+    private function sendImagePackage($packageData)
     {
         $data = [];
 
@@ -97,22 +104,31 @@ class ProductSenderRepository
         $this->db->insert('oc_product_image', $data);
     }
 
-    private function addCategoryPackage($packageData)
+    private function sendCategoryPackage($packageData)
     {
         $data = [];
 
         foreach ($packageData as $key)
         {
-            foreach ($key['category_id'] as $path)
-            {
-                $data[] = ['product_id' => $key['product_id'], 'category_id' => $path];
+
+            $categories = $this->db->select('oc_category_path', ['category_id', 'path_id'], [
+                'category_id[=]' => $key['category_id'],
+                'ORDER' => ['path_id' => 'ASC']
+            ]);
+
+            foreach ($categories as $category) {
+
+                $data[] = ['product_id' => $key['product_id'], 'category_id' => $category['path_id']];
+
             }
+
+
         }
 
         $this->db->insert('oc_product_to_category', $data);
     }
 
-    private function addStorePackage($packageData)
+    private function sendStorePackage($packageData)
     {
         $data = [];
 
@@ -124,7 +140,7 @@ class ProductSenderRepository
         $this->db->insert('oc_product_to_store', $data);
     }
 
-    private function addRenterPackage($packageData)
+    private function sendRenterPackage($packageData)
     {
         $data = [];
 
@@ -135,5 +151,4 @@ class ProductSenderRepository
 
         $this->db->insert('oc_product_to_renter', $data);
     }
-
 }

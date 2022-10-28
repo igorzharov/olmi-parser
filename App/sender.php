@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Services\ProductService;
+require_once '../vendor/autoload.php';
 
-require_once 'vendor/autoload.php';
+use App\Sender\ProductSender;
 
-$updater = new ProductService();
+$parserName = 'ParserSportal';
 
-$updater->send('ParserSantehOrbita');
+(new ProductSender())->send($parserName);

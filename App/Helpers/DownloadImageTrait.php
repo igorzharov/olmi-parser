@@ -16,16 +16,25 @@ trait DownloadImageTrait
 
         $file = $imageFolder . md5($url) . '.jpg';
 
-        if (!file_exists($file)) {
-
-            $result = file_get_contents($url);
-
-            if (!$result) return '';
-
-            file_put_contents($file, $result);
-
+        if (file_exists($file)) {
+            return $this->replacePath($file);
         }
 
+        try {
+            $result = file_get_contents($url);
+        } catch (\Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+
+            return '';
+        }
+
+        file_put_contents($file, $result);
+
+        return $this->replacePath($file);
+    }
+
+    private function replacePath(string $file): string
+    {
         $file = str_replace('var/image/', '', $file);
 
         return 'catalog/' . $file;

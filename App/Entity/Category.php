@@ -7,6 +7,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinTable;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'categories')]
@@ -26,6 +27,9 @@ class Category
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $url;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $parser_class_name;
+
     #[ORM\Column(type: 'integer')]
     private int $remoteId = 0;
 
@@ -35,13 +39,19 @@ class Category
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $productUrls;
 
+    #[ORM\JoinTable(name: 'relations')]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'product_id', referencedColumnName: 'id', unique: true)]
+    #[ORM\ManyToMany(targetEntity: 'Product')]
+    private Collection $products;
+
     public function __construct(string $name, string $url, int $remoteId)
     {
         $this->name = $name;
         $this->url = $url;
         $this->remoteId = $remoteId;
 
-        $this->relations = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): int
@@ -89,6 +99,16 @@ class Category
         $this->remoteId = $remoteId;
     }
 
+    public function setParserClassName(string $parserClassName) : void
+    {
+        $this->parser_class_name = $parserClassName;
+    }
+
+    public function getParserClassName() : string
+    {
+        return $this->parser_class_name;
+    }
+
     public function getPagesUrls(): array
     {
         return $this->pagesUrls;
@@ -117,5 +137,15 @@ class Category
     public function clearProductUrls()
     {
         $this->productUrls = [];
+    }
+
+    public function addProduct(Product $product) : void
+    {
+        $this->products->add($product);
+    }
+
+    public function getProducts() : Collection
+    {
+        return $this->products;
     }
 }

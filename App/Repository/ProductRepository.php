@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\DB\DBParser;
+use App\bin\EntityManagerFactory;
+use App\Entity\Product;
+use Doctrine\ORM\EntityManager;
 
 class ProductRepository
 {
-    private DBParser $db;
 
-    public function __construct()
+    public static function getNotSentProducts(string $parserClassName): array
     {
-        $this->db = new DBParser();
+        return EntityManagerFactory::create()->getRepository(Product::class)->findBy(
+            criteria: [
+                'status' => true,
+                'is_sent' => false,
+                'parser_class_name' => $parserClassName
+            ]
+        );
     }
 
-    public function getProducts(): array
+    public static function getSentProducts(string $parserClassName): array
     {
-        $selectWhere = ['products.is_parsed[=]' => 0, 'products.status[=]' => 1];
-
-        // LEFT JOIN
-
-        return $this->db->select('products', ['[>]relations' => ['product_id' => 'product_id']], ['relations.category_id', 'products.product_id', 'products.title', 'products.description', 'products.price', 'products.image', 'products.parser_class'], $selectWhere);
-    }
-
-    public function getUpdatedProducts(): array
-    {
-        $selectWhere = ['products.is_parsed[=]' => 1, 'products.is_update[=]' => 1, 'products.status[=]' => 1];
-
-        // LEFT JOIN
-
-        return $this->db->select('products', ['[>]relations' => ['product_id' => 'product_id']], ['relations.category_id', 'products.product_id', 'products.title', 'products.description', 'products.price', 'products.image'], $selectWhere);
+        return EntityManagerFactory::create()->getRepository(Product::class)->findBy(
+            criteria: [
+                'status' => true,
+                'is_sent' => true,
+                'parser_class_name' => $parserClassName
+            ]
+        );
     }
 
 }
