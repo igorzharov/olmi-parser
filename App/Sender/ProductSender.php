@@ -113,7 +113,7 @@ class ProductSender
 
             $categories = $this->db->select('oc_category_path', ['category_id', 'path_id'], [
                 'category_id[=]' => $key['category_id'],
-                'ORDER' => ['path_id' => 'ASC']
+                'ORDER' => ['level' => 'ASC']
             ]);
 
             foreach ($categories as $category) {
@@ -121,7 +121,6 @@ class ProductSender
                 $data[] = ['product_id' => $key['product_id'], 'category_id' => $category['path_id']];
 
             }
-
 
         }
 

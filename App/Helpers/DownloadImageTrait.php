@@ -20,12 +20,10 @@ trait DownloadImageTrait
             return $this->replacePath($file);
         }
 
-        try {
-            $result = file_get_contents($url);
-        } catch (\Exception $exception) {
-            echo $exception->getMessage() . PHP_EOL;
+        $result = file_get_contents($url);
 
-            return '';
+        if ($result === false) {
+            throw new \Exception('Изображение .... не щагруженно, ошибка');
         }
 
         file_put_contents($file, $result);
