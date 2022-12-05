@@ -16,6 +16,8 @@ trait DownloadImageTrait
 
         $file = $imageFolder . md5($url) . '.jpg';
 
+        var_dump($file);
+
         if (file_exists($file)) {
             return $this->replacePath($file);
         }

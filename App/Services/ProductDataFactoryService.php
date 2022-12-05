@@ -25,12 +25,13 @@ class ProductDataFactoryService
         {
             $products = $category->getProducts();
 
-            $categoryId = 466;
-
-            /** @var $categories Product[] */
+            /** @var $products Product[] */
             foreach ($products as $product) {
 
-                $data[] = $this->getPreparedData($product, $categoryId);
+                if ($product->getImage() == '') continue;
+                if ($product->getPrice() == 0) continue;
+
+                $data[] = $this->getPreparedData($product, $category->getRemoteId());
 
             }
         }
@@ -52,9 +53,9 @@ class ProductDataFactoryService
 
         $date = date('Y-m-d H:i:s');
 
-        $renterId = 100;
+        $renterId = 196;
 
-        $userId = 1;
+        $userId = 162;
 
         return [
             'name' => $product->getName(),
@@ -65,7 +66,7 @@ class ProductDataFactoryService
             'location' => $location,
             'quantity' => $quantity,
             'stock_status_id' => 1,
-            'image' => $product->getImage(),
+            'image' => 'https://cdn.orbita74.ru/image/' . $product->getImage(),
             'shipping' => 1,
             'price' => $product->getPrice(),
             'tax_class_id' => 0,

@@ -8,4 +8,5 @@ use App\Parsers\ParserFactory;
 
 $parser = ParserFactory::from('ParserOvkm')->create();
 
-$categories = $parser->parserStart();
+$parser->parserStart();
+

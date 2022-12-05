@@ -110,7 +110,6 @@ class ProductSender
 
         foreach ($packageData as $key)
         {
-
             $categories = $this->db->select('oc_category_path', ['category_id', 'path_id'], [
                 'category_id[=]' => $key['category_id'],
                 'ORDER' => ['level' => 'ASC']

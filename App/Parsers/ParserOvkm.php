@@ -41,10 +41,10 @@ class ParserOvkm extends ParserAbstract
      */
     public function parserStart()
     {
-//        $this->parserCategories();
+        $this->parserCategories();
 //        $this->parserGetCategories();
 //        $this->parserGetCategoriesProductsUrls();
-        $this->parserProducts();
+//        $this->parserProducts();
     }
 
     /**
@@ -58,10 +58,13 @@ class ParserOvkm extends ParserAbstract
         $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         foreach ($categories as $category) {
+
+            /** @var $hasCategory Category */
             $hasCategory = $categoryRepository->findOneBy(['name' => $category->getName()]);
 
             if ($hasCategory) {
-                continue;
+                $hasCategory->setRemoteId($category->getRemoteId());
+                $this->entityManager->flush($hasCategory);
             }
 
             $category->setParserClassName($this->getParserClassName());
@@ -146,8 +149,6 @@ class ParserOvkm extends ParserAbstract
      */
     private function parserProducts()
     {
-        $categories = ParserOvkmCategoriesRepository::getCategories();
-
         $categoryRepository = $this->entityManager->getRepository(Category::class);
 
         /** @var $categories Category[] */
@@ -199,12 +200,7 @@ class ParserOvkm extends ParserAbstract
 
                 $product->setPrice($this->getProductPrice($crawler));
 
-                try {
-                    $product->setImage($this->getProductImage($crawler));
-                } catch (\Exception) {
-
-                    $product->setImage('');
-                }
+                $product->setImage($this->getProductImage($crawler));
 
                 $product->setUrl($productUrl);
 
@@ -259,7 +255,11 @@ class ParserOvkm extends ParserAbstract
     {
         $url = $this->siteUrl . $crawler->filter('#photo-0 a')->attr('href');
 
-        return $this->downloadImage($url, $this->getParserClassName());
+        try {
+            return $this->downloadImage($url, $this->getParserClassName());
+        } catch (\Exception $exception) {
+            return '';
+        }
     }
 
 }
