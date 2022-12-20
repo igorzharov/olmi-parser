@@ -174,7 +174,7 @@ class ParserSportalCategoriesRepository
             new Category(
                 name: 'Защита, суппорты',
                 url: 'https://tdsportal.ru/catalog/supporty_zashchita/',
-                remoteId: 7700
+                remoteId: 770
             ),
             new Category(
                 name: 'Коврики',
