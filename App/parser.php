@@ -6,7 +6,7 @@ require_once '../vendor/autoload.php';
 
 use App\Parsers\ParserFactory;
 
-$parser = ParserFactory::from('ParserOvkm')->create();
+$parser = ParserFactory::from('ParserSportal')->create();
 
 $parser->parserStart();
 
