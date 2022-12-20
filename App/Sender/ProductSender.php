@@ -38,6 +38,8 @@ class ProductSender
 
             $product_id = $this->sendProduct($key);
 
+            $this->updateRemoteProductId($key['id_external'], $product_id);
+
             echo 'Отправил Товар ' . $key['name'] . ' - ' . round(microtime(true) - $start, 3) . ' сек.' . PHP_EOL;
 
             $key['product_id'] = $product_id;
@@ -148,5 +150,10 @@ class ProductSender
         }
 
         $this->db->insert('oc_product_to_renter', $data);
+    }
+
+    private function updateRemoteProductId($id, $opencartProductId)
+    {
+        $this->db->update(table: 'oc_product_to_renter', data: ['remote_product_id' => $opencartProductId], where: ['id=' => $id]);
     }
 }
