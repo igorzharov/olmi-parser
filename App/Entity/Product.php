@@ -53,7 +53,7 @@ class Product
     private bool $is_sent;
 
     #[ORM\Column(type: 'integer')]
-    private int $remote_product_id;
+    private int $opencart_product_id;
 
     #[ORM\Column(type: 'boolean')]
     private bool $status;
@@ -64,7 +64,7 @@ class Product
         $this->updated_at = new DateTime();
         $this->is_update = true;
         $this->is_sent = false;
-        $this->remote_product_id = 0;
+        $this->opencart_product_id = 0;
         $this->status = true;
     }
 
@@ -210,22 +210,6 @@ class Product
     public function setIsSent(bool $is_sent): void
     {
         $this->is_sent = $is_sent;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRemoteProductId(): int
-    {
-        return $this->remote_product_id;
-    }
-
-    /**
-     * @param int $remote_product_id
-     */
-    public function setRemoteProductId(int $remote_product_id): void
-    {
-        $this->remote_product_id = $remote_product_id;
     }
 
     /**
