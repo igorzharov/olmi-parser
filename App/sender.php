@@ -6,6 +6,6 @@ require_once '../vendor/autoload.php';
 
 use App\Sender\ProductSender;
 
-$parserName = 'ParserOvkm';
+$parserName = 'ParserSportal';
 
 (new ProductSender())->send($parserName);
