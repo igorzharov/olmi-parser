@@ -41,10 +41,58 @@ class Product
     private string $parser_class_name;
 
     #[ORM\Column(type: 'datetime')]
-    private DateTime $date_create;
+    private DateTime $created_at;
 
     #[ORM\Column(type: 'datetime')]
-    private DateTime $date_modify;
+    private DateTime $updated_at;
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt(): DateTime
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @param DateTime $created_at
+     */
+    public function setCreatedAt(DateTime $created_at): void
+    {
+        $this->created_at = $created_at;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @param DateTime $updated_at
+     */
+    public function setUpdatedAt(DateTime $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRemoteProductId(): int
+    {
+        return $this->remote_product_id;
+    }
+
+    /**
+     * @param int $remote_product_id
+     */
+    public function setRemoteProductId(int $remote_product_id): void
+    {
+        $this->remote_product_id = $remote_product_id;
+    }
 
     #[ORM\Column(type: 'boolean')]
     private bool $is_update;
@@ -52,15 +100,19 @@ class Product
     #[ORM\Column(type: 'boolean')]
     private bool $is_sent;
 
+    #[ORM\Column(type: 'int')]
+    private int $remote_product_id;
+
     #[ORM\Column(type: 'boolean')]
     private bool $status;
 
     public function __construct()
     {
-        $this->date_create = new DateTime();
-        $this->date_modify = new DateTime();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
         $this->is_update = true;
         $this->is_sent = false;
+        $this->remote_product_id = 0;
         $this->status = true;
     }
 
@@ -127,31 +179,6 @@ class Product
     public function getParserClassName() : string
     {
         return $this->parser_class_name;
-    }
-
-    public function setCreated(DateTime $created)
-    {
-        $this->created = $created;
-    }
-
-    public function setUpdated(DateTime $updated)
-    {
-        $this->updated = $updated;
-    }
-
-    public function setStatus(bool $status)
-    {
-        $this->status = $status;
-    }
-
-    public function setIsUpdate(bool $isUpdate)
-    {
-        $this->is_update = $isUpdate;
-    }
-
-    public function setIsSent(bool $isSent)
-    {
-        $this->is_sent = $isSent;
     }
 
 }
