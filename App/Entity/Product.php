@@ -46,36 +46,170 @@ class Product
     #[ORM\Column(type: 'datetime')]
     private DateTime $updated_at;
 
-    /**
-     * @return DateTime
-     */
-    public function getCreatedAt(): DateTime
+    #[ORM\Column(type: 'boolean')]
+    private bool $is_update;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $is_sent;
+
+    #[ORM\Column(type: 'integer')]
+    private int $remote_product_id;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $status;
+
+    public function __construct()
     {
-        return $this->created_at;
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
+        $this->is_update = true;
+        $this->is_sent = false;
+        $this->remote_product_id = 0;
+        $this->status = true;
     }
 
     /**
-     * @param DateTime $created_at
+     * @return int
      */
-    public function setCreatedAt(DateTime $created_at): void
+    public function getId(): int
     {
-        $this->created_at = $created_at;
+        return $this->id;
     }
 
     /**
-     * @return DateTime
+     * @param int $id
      */
-    public function getUpdatedAt(): DateTime
+    public function setId(int $id): void
     {
-        return $this->updated_at;
+        $this->id = $id;
     }
 
     /**
-     * @param DateTime $updated_at
+     * @return string
      */
-    public function setUpdatedAt(DateTime $updated_at): void
+    public function getName(): string
     {
-        $this->updated_at = $updated_at;
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string|null $description
+     */
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPrice(): int
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param int $price
+     */
+    public function setPrice(int $price): void
+    {
+        $this->price = $price;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage(): string
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage(string $image): void
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl(string $url): void
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParserClassName(): string
+    {
+        return $this->parser_class_name;
+    }
+
+    /**
+     * @param string $parser_class_name
+     */
+    public function setParserClassName(string $parser_class_name): void
+    {
+        $this->parser_class_name = $parser_class_name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIsUpdate(): bool
+    {
+        return $this->is_update;
+    }
+
+    /**
+     * @param bool $is_update
+     */
+    public function setIsUpdate(bool $is_update): void
+    {
+        $this->is_update = $is_update;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIsSent(): bool
+    {
+        return $this->is_sent;
+    }
+
+    /**
+     * @param bool $is_sent
+     */
+    public function setIsSent(bool $is_sent): void
+    {
+        $this->is_sent = $is_sent;
     }
 
     /**
@@ -94,91 +228,37 @@ class Product
         $this->remote_product_id = $remote_product_id;
     }
 
-    #[ORM\Column(type: 'boolean')]
-    private bool $is_update;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $is_sent;
-
-    #[ORM\Column(type: 'int')]
-    private int $remote_product_id;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $status;
-
-    public function __construct()
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt(): DateTime
     {
-        $this->created_at = new DateTime();
-        $this->updated_at = new DateTime();
-        $this->is_update = true;
-        $this->is_sent = false;
-        $this->remote_product_id = 0;
-        $this->status = true;
+        return $this->created_at;
     }
 
-    public function getId(): int
+    /**
+     * @return DateTime
+     */
+    public function getUpdatedAt(): DateTime
     {
-        return $this->id;
+        return $this->updated_at;
     }
 
-    public function getName(): string
+    /**
+     * @return bool
+     */
+    public function isStatus(): bool
     {
-        return $this->name;
+        return $this->status;
     }
 
-    public function setName(string $name) : void
+    /**
+     * @param bool $status
+     */
+    public function setStatus(bool $status): void
     {
-        $this->name = $name;
+        $this->status = $status;
     }
 
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description) : void
-    {
-        $this->description = $description;
-    }
-
-    public function getPrice(): int
-    {
-        return $this->price;
-    }
-
-    public function setPrice(int $price) : void
-    {
-        $this->price = $price;
-    }
-
-    public function getImage(): string
-    {
-        return $this->image;
-    }
-
-    public function setImage(string $image) : void
-    {
-        $this->image = $image;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(string $url) : void
-    {
-        $this->url = $url;
-    }
-
-    public function setParserClassName(string $parserClassName) : void
-    {
-        $this->parser_class_name = $parserClassName;
-    }
-
-    public function getParserClassName() : string
-    {
-        return $this->parser_class_name;
-    }
 
 }
